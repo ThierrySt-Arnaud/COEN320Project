@@ -1,7 +1,7 @@
 ARTIFACT = COEN320Project
 
 #Build architecture/variant string, possible values: x86, armv7le, etc...
-PLATFORM ?= x86
+PLATFORM ?= x86_64
 
 #Build profile, possible values: release, debug, profile, coverage
 BUILD_PROFILE ?= debug
@@ -12,9 +12,9 @@ TARGET = $(OUTPUT_DIR)/$(ARTIFACT)
 
 #Compiler definitions
 
-CC = qcc -Vgcc_nto$(PLATFORM)
+CC = qcc -Vgcc_nto$(PLATFORM) 
 CXX = qcc -lang-c++ -Vgcc_nto$(PLATFORM)
-LD = $(CXX)
+LD = $(CXX) -l mq
 
 #User defined include/preprocessor flags and libraries
 

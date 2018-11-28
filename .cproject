@@ -176,7 +176,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildProperties="" id="com.qnx.qcc.toolChain.1788508569" name="x86-debug" parent="org.eclipse.cdt.build.core.emptycfg">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="com.qnx.qcc.toolChain.1788508569" name="x86-debug" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="com.qnx.qcc.toolChain.1788508569.553218418" name="/" resourcePath="">
 						<toolChain id="com.qnx.qcc.toolChain.2146847829" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<option id="com.qnx.qcc.option.os.888338089" name="Target OS:" superClass="com.qnx.qcc.option.os"/>
@@ -185,16 +185,16 @@
 							<option id="com.qnx.qcc.option.runtime.401813902" name="C++ Runtime:" superClass="com.qnx.qcc.option.runtime"/>
 							<option id="com.qnx.qcc.option.buildtype.1304216368" name="Build Type:" superClass="com.qnx.qcc.option.buildtype"/>
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.1437873328" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder id="cdt.managedbuild.target.gnu.builder.base.812962830" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<builder buildPath="${workspace_loc:/COEN320Project}" id="cdt.managedbuild.target.gnu.builder.base.812962830" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="com.qnx.qcc.tool.compiler.1723873289" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
-								<option id="com.qnx.qcc.option.compiler.optlevel.438176163" superClass="com.qnx.qcc.option.compiler.optlevel" useByScannerDiscovery="false" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
+								<option id="com.qnx.qcc.option.compiler.optlevel.438176163" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" useByScannerDiscovery="false" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
 								<inputType id="com.qnx.qcc.inputType.compiler.849178105" superClass="com.qnx.qcc.inputType.compiler"/>
 							</tool>
 							<tool id="com.qnx.qcc.tool.assembler.1434242472" name="QCC Assembler" superClass="com.qnx.qcc.tool.assembler">
 								<inputType id="com.qnx.qcc.inputType.assembler.2018795770" superClass="com.qnx.qcc.inputType.assembler"/>
 							</tool>
 							<tool id="com.qnx.qcc.tool.linker.469126413" name="QCC Linker" superClass="com.qnx.qcc.tool.linker">
-								<option id="com.qnx.qcc.option.linker.langcpp.1279579000" superClass="com.qnx.qcc.option.linker.langcpp" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.qnx.qcc.option.linker.langcpp.1279579000" name="C++ (-lang-c++)" superClass="com.qnx.qcc.option.linker.langcpp" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							</tool>
 							<tool id="com.qnx.qcc.tool.archiver.1113649343" name="QCC Archiver" superClass="com.qnx.qcc.tool.archiver"/>
 						</toolChain>
@@ -361,6 +361,31 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="x86_64-debug">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86_64-release">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86-coverage">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86-profile">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86_64-coverage">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86-release">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86_64-profile">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+		<configuration configurationName="x86-debug">
+			<resource resourceType="PROJECT" workspacePath="/COEN320Project"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
