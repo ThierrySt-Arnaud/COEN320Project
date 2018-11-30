@@ -11,20 +11,28 @@
 #include <queue>
 #include <pthread.h>
 #include <fstream>
+#include <atomic>
 #include "OperatorCommand.h"
 #include "Airspace.h"
+
+typedef void * (*KBLISTENER_FUNC_PTR)(void *);
+typedef void * (*CMDINTERPRETER_FUNC_PTR)(void *);
 
 class KeyboardListener {
 public:
 
-//	KeyboardListener(Airspace, pthread_attr_t* = nullptr);
-//	virtual ~KeyboardListener();
+	KeyboardListener(Airspace*, CommServer*, pthread_attr_t* = nullptr);
+	virtual ~KeyboardListener();
 	const pthread_t* run();
-	bool kill();
+	void kill();
 private:
 	pthread_mutex_t commandMutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_t kbListener, cmdInterpreter;
-//	std::queue<OperatorCommand> commandQueue;
+	pthread_t kbListener = false, cmdInterpreter = false;
+	pthread_attr_t* threadAttr;
+	Airspace* airspace;
+	CommServer* commserver;
+	std::queue<OperatorCommand> commandQueue;
+	std::atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void* keyboardListener(void*);
 	void* commandInterpreter(void*);
 };

@@ -7,12 +7,35 @@
 
 #include "KeyboardListener.h"
 
-/*KeyboardListener::KeyboardListener() {
-	// TODO Auto-generated constructor stub
-
+KeyboardListener::KeyboardListener(Airspace* airspace, CommServer* commServer, pthread_attr_t* threadAttr){
+	this->airspace = airspace;
+	this->commserver = commServer;
+	this->threadAttr = threadAttr;
 }
 
 KeyboardListener::~KeyboardListener() {
-	// TODO Auto-generated destructor stub
-}*/
+	pthread_attr_destroy(threadAttr);
+	this->kill();
+}
 
+const pthread_t* KeyboardListener::run(){
+	if (pthread_create(&cmdInterpreter, threadAttr, (KBLISTENER_FUNC_PTR) &KeyboardListener::commandInterpreter, this) == 0){
+		return &kbListener;
+	} else
+		return nullptr;
+}
+
+void* KeyboardListener::keyboardListener(void*){
+	while(!killFlag){
+
+	}
+	return nullptr;
+}
+
+void* KeyboardListener::commandInterpreter(void*){
+	return nullptr;
+}
+
+void KeyboardListener::kill(){
+	killFlag = true;
+}

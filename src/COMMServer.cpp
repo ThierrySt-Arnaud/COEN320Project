@@ -7,7 +7,6 @@
 
 #include "CommServer.h"
 #include <sstream>
-#include <stdint.h>
 
 CommServer::CommServer(pthread_attr_t* threadAttr): commOut(COMM_OUT, std::fstream::out | std::fstream::trunc){
 	this->threadAttr = threadAttr;

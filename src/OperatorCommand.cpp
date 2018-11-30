@@ -7,8 +7,9 @@
 
 #include "OperatorCommand.h"
 
-OperatorCommand::OperatorCommand(OpCmdType type){
+OperatorCommand::OperatorCommand(OpCmdType type, std::array<int, 4> content){
 	this->type = type;
+	this->content = content;
 }
 
 OpCmdType OperatorCommand::getType(){
@@ -17,4 +18,12 @@ OpCmdType OperatorCommand::getType(){
 
 void OperatorCommand::setType(OpCmdType type){
 	this->type = type;
+}
+
+OpCmdType OperatorCommand::getContent(){
+	return this->content;
+}
+
+void OperatorCommand::setContent(OpCmdType type){
+	this->content = content;
 }
