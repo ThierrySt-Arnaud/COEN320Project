@@ -31,7 +31,7 @@ int main(){
 	pthread_join(keyboardListener.run(), NULL);
 	endwin();
 	fflush(stdout);
-	printf("Waiting for commServer to close.\n");
+	commServer.kill();
 	return 0;
 }
 

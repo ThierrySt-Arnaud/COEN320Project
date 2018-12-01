@@ -38,12 +38,14 @@ void *CommServer::commSender(void *){
 	commOut << "Output thread ready" << std::endl;
 	while (!killFlag){
 		pthread_sleepon_lock();
-		while (outgoingQueue.empty()){
+		while (!killFlag && outgoingQueue.empty()){
 			pthread_sleepon_wait(&outgoingQueue);
 		}
+
 		if (killFlag){
 			break;
 		}
+
 		CommMessage message = outgoingQueue.front();
 		outgoingQueue.pop();
 		pthread_sleepon_unlock();
@@ -71,7 +73,6 @@ void *CommServer::commSender(void *){
 	}
 
 	//When asked to quit, empty the outgoing queue
-	pthread_sleepon_lock();
 	while (!outgoingQueue.empty()){
 		CommMessage message = outgoingQueue.front();
 		outgoingQueue.pop();
@@ -156,6 +157,8 @@ void CommServer::printHandoff(int ID){
 
 void CommServer::kill(){
 	killFlag = true;
+	pthread_sleepon_lock();
 	pthread_sleepon_signal(&outgoingQueue);
+	pthread_sleepon_unlock();
 	pthread_join(commServer, NULL);
 }
