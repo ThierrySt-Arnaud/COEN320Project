@@ -6,6 +6,7 @@
  */
 
 #include "Airspace.h"
+#include <iostream>
 
 Airspace::Airspace() {
 	// TODO Auto-generated constructor stub
@@ -17,13 +18,13 @@ Airspace::~Airspace() {
 }
 
 
-vector<Hit> addAircraft(vector<Hit> vector, Hit hit) {
+std::vector<Hit> Airspace::addAircraft(std::vector<Hit> vector, Hit hit) {
 
 	vector.push_back(hit);
 	return vector;
 }
 
-vector<Hit> remAircraft(vector<Hit> vector, int id) {
+std::vector<Hit> Airspace::remAircraft(std::vector<Hit> vector, int id) {
 
 	for(unsigned int i=0; i<vector.size(); i++) {
 		if(vector[i].getId() == id) {
@@ -33,7 +34,7 @@ vector<Hit> remAircraft(vector<Hit> vector, int id) {
 	return vector;
 }
 
-vector<Hit> editAircraft(vector<Hit> vector, int id, int x, int y, int z) {
+std::vector<Hit> Airspace::editAircraft(std::vector<Hit> vector, int id, int x, int y, int z) {
 
 	for(unsigned int i=0; i<vector.size(); i++) {
 		if(vector[i].getId() == id) {
@@ -44,10 +45,10 @@ vector<Hit> editAircraft(vector<Hit> vector, int id, int x, int y, int z) {
 	return vector;
 }
 
-void display(vector<Hit> vector) {
+void Airspace::display(std::vector<Hit> vector) {
 	for(Hit x : vector) {
-				cout << "Aircraft_id: " << x.getId() << endl;
-				cout << "Coordinates: (" << x.getXCoordinates() << ',' << x.getYCoordinates() << ',' << x.getZCoordinates() << ')' << endl;
+				std::cout << "Aircraft_id: " << x.getId() << std::endl;
+				std::cout << "Coordinates: (" << x.getXCoordinates() << ',' << x.getYCoordinates() << ',' << x.getZCoordinates() << ')' << std::endl;
 			}
-	cout << endl;
+	std::cout << std::endl;
 }

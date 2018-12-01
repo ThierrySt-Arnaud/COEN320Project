@@ -50,8 +50,11 @@ void *CommServer::commSender(void *){
 			case REPORT:
 				printReport(remoteID);
 				break;
-			case REQUEST:
-				printRequest(remoteID, content);
+			case SPDREQUEST:
+				printSpdRequest(remoteID, content);
+				break;
+			case ALTREQUEST:
+				printAltRequest(remoteID, content);
 				break;
 			case HANDOFF:
 				printHandoff(remoteID);
@@ -75,8 +78,11 @@ void *CommServer::commSender(void *){
 			case REPORT:
 				printReport(remoteID);
 				break;
-			case REQUEST:
-				printRequest(remoteID, content);
+			case SPDREQUEST:
+				printSpdRequest(remoteID, content);
+				break;
+			case ALTREQUEST:
+				printAltRequest(remoteID, content);
 				break;
 			case HANDOFF:
 				printHandoff(remoteID);
@@ -102,20 +108,34 @@ void CommServer::printReport(int ID){
 	}
 }
 
-void CommServer::printRequest(int ID, std::string content){
+void CommServer::printSpdRequest(int ID, std::string content){
 	std::stringstream parsingBuffer = std::stringstream(content, std::iostream::in);
-	int vx, vy, vz, z ;
-	parsingBuffer >> vx >> vy >> vz >> z;
+	int vx, vy, vz;
+	parsingBuffer >> vx >> vy >> vz;
 
 	if (ID < 0){
 		commOut << "Requesting unidentified plane " << abs(ID) << " changes to speed to:\n"
-				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz << " and reach altitude " << z;
+				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	} else if (ID > 0){
 		commOut << "Requesting airplane " << ID << " changes to speed to:\n"
-				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz << " and reach altitude " << z;
+				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	} else {
 		commOut << "Requesting all planes changes to speed to:\n"
-				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz << " and reach altitude " << z;
+				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
+	}
+}
+
+void CommServer::printAltRequest(int ID, std::string content){
+	std::stringstream parsingBuffer = std::stringstream(content, std::iostream::in);
+	int z ;
+	parsingBuffer >> z;
+
+	if (ID < 0){
+		commOut << "Requesting unidentified plane " << abs(ID) << " changes to altitude to: " << z << " feet.";
+	} else if (ID > 0){
+		commOut << "Requesting airplane " << ID << " changes to altitude to: " << z << " feet.";
+	} else {
+		commOut << "Requesting all planes changes to altitude to:" << z << " feet.";
 	}
 }
 

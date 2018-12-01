@@ -36,7 +36,8 @@ private:
 	std::atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void *commSender(void *);
 	void printReport(int ID);
-	void printRequest(int ID, std::string content);
+	void printSpdRequest(int ID, std::string content);
+	void printAltRequest(int ID, std::string content);
 	void printHandoff(int ID);
 };
 

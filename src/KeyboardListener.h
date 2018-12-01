@@ -8,33 +8,38 @@
 #ifndef KEYBOARDLISTENER_H_
 #define KEYBOARDLISTENER_H_
 
-#include <queue>
 #include <pthread.h>
-#include <fstream>
 #include <atomic>
-#include "OperatorCommand.h"
+#include <ncurses.h>
 #include "Airspace.h"
+#include "CommServer.h"
+#include "CommMessage.h"
 
 typedef void * (*KBLISTENER_FUNC_PTR)(void *);
-typedef void * (*CMDINTERPRETER_FUNC_PTR)(void *);
+
+const char OPERATORCOMMANDS[] = "a - Altitude change, s - Speed change, d - Report status, q - Quit";
 
 class KeyboardListener {
 public:
-
-	KeyboardListener(Airspace*, CommServer*, pthread_attr_t* = nullptr);
+	KeyboardListener(Airspace*, CommServer*, WINDOW*, int[], pthread_attr_t* = nullptr);
 	virtual ~KeyboardListener();
 	const pthread_t* run();
 	void kill();
 private:
-	pthread_mutex_t commandMutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_t kbListener = false, cmdInterpreter = false;
+	WINDOW* msg_win;
+	WINDOW* input_win;
+	pthread_t kbListener = false;
 	pthread_attr_t* threadAttr;
 	Airspace* airspace;
 	CommServer* commserver;
-	std::queue<OperatorCommand> commandQueue;
+	int screenSize[2];
 	std::atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void* keyboardListener(void*);
-	void* commandInterpreter(void*);
+	void altitude_change();
+	void speed_change();
+	void request_report();
+	void readyInputWindow();
+	bool confirm();
 };
 
 #endif /* KEYBOARDLISTENER_H_ */
