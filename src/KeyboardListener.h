@@ -21,12 +21,11 @@ const char OPERATORCOMMANDS[] = "a - Altitude change, s - Speed change, d - Repo
 
 class KeyboardListener {
 public:
-	KeyboardListener(Airspace*, CommServer*, WINDOW*, int[], pthread_attr_t* = nullptr);
+	KeyboardListener(Airspace*, CommServer*, int[], pthread_attr_t* = nullptr);
 	virtual ~KeyboardListener();
-	const pthread_t* run();
+	pthread_t run();
 	void kill();
 private:
-	WINDOW* msg_win;
 	WINDOW* input_win;
 	pthread_t kbListener = false;
 	pthread_attr_t* threadAttr;
@@ -39,6 +38,7 @@ private:
 	void speed_change();
 	void request_report();
 	void readyInputWindow();
+	void inputTimeout();
 	bool confirm();
 };
 

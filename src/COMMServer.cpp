@@ -11,6 +11,7 @@
 CommServer::CommServer(pthread_attr_t* threadAttr): commOut(COMM_OUT, std::fstream::out | std::fstream::trunc){
 	this->threadAttr = threadAttr;
 	this->outgoingQueue = std::queue<CommMessage>();
+	commOut << "Communication channel open" << std::endl;
 }
 
 CommServer::~CommServer(){
@@ -19,11 +20,11 @@ CommServer::~CommServer(){
 	this->commOut.close();
 }
 
-const pthread_t* CommServer::run(){
+pthread_t CommServer::run(){
 	if (pthread_create(&commServer, threadAttr, (COMMSERVER_FUNC_PTR) &CommServer::commSender, this) == 0){
-		return &commServer;
+		return commServer;
 	} else
-		return nullptr;
+		return -1;
 }
 
 void CommServer::send(CommMessage message){
@@ -34,10 +35,14 @@ void CommServer::send(CommMessage message){
 }
 
 void *CommServer::commSender(void *){
+	commOut << "Output thread ready" << std::endl;
 	while (!killFlag){
 		pthread_sleepon_lock();
 		while (outgoingQueue.empty()){
 			pthread_sleepon_wait(&outgoingQueue);
+		}
+		if (killFlag){
+			break;
 		}
 		CommMessage message = outgoingQueue.front();
 		outgoingQueue.pop();
@@ -62,7 +67,7 @@ void *CommServer::commSender(void *){
 			default:
 				commOut << "Invalid Message type!";
 		}
-		commOut << '\n';
+		commOut << std::endl;
 	}
 
 	//When asked to quit, empty the outgoing queue
@@ -90,7 +95,7 @@ void *CommServer::commSender(void *){
 			default:
 				commOut << "Invalid Message type!";
 		}
-		commOut << '\n';
+		commOut << std::endl;
 	}
 	commOut << "Communication output terminated" << std::endl;
 	pthread_sleepon_unlock();
@@ -114,13 +119,13 @@ void CommServer::printSpdRequest(int ID, std::string content){
 	parsingBuffer >> vx >> vy >> vz;
 
 	if (ID < 0){
-		commOut << "Requesting unidentified plane " << abs(ID) << " changes to speed to:\n"
+		commOut << "Requesting unidentified plane " << abs(ID) << " change speed to:\n"
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	} else if (ID > 0){
-		commOut << "Requesting airplane " << ID << " changes to speed to:\n"
+		commOut << "Requesting airplane " << ID << " change speed to:\n"
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	} else {
-		commOut << "Requesting all planes changes to speed to:\n"
+		commOut << "Requesting all planes change speed to:\n"
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	}
 }

@@ -24,7 +24,7 @@ public:
 	CommServer(pthread_attr_t* = nullptr);
 	CommServer(const CommServer&) = delete;
 	virtual ~CommServer();
-	const pthread_t* run();
+	pthread_t run();
 	void send(CommMessage);
 	void kill();
 private:
