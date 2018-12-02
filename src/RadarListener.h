@@ -13,24 +13,27 @@
 #include <atomic>
 #include <queue>
 #include <string>
+#include "Airspace.h"
 using namespace std;
 
 typedef void * (*RADAR_FUNC_PTR)(void *);
 
+#define INPUT_FILE "/home/qnxuser/ATC/RadarIn.txt"
+
 class RadarListener {
 public:
-	RadarListener(pthread_attr_t* = nullptr);
+	RadarListener(Airspace*, pthread_attr_t* = nullptr);
 	RadarListener(const RadarListener&) = delete;
 	virtual ~RadarListener();
 	const pthread_t* run();
-	void populateAirspace(string);
 	void kill();
 private:
 	pthread_attr_t* threadAttr;
 	pthread_mutex_t outgoingMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_t radarListener = false;
+	Airspace* airspace;
 	atomic_bool killFlag = ATOMIC_VAR_INIT(false);
-	void *updateAirspace(void *);
+	void *populateAirspace(void *);
 };
 
 #endif /* SRC_RADARLISTENER_H_ */

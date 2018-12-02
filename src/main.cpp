@@ -20,17 +20,16 @@
 #include <sstream>
 #include <iostream>
 
-Airspace airspace;
 void ncursesSetup(int[]);
-void populateAirspace(string);
+//void populateAirspace(string);
 
 int main(){
 
-	populateAirspace("/home/qnxuser/ATC/RadarIn.txt");
+	/*populateAirspace("/home/qnxuser/ATC/RadarIn.txt");
 
 		for(Hit x : airspace.getAircrafts()) {
 			cout << '(' << x.getId() << ',' << x.getSpeedx() << ',' << x.getSpeedy() << ',' << x.getSpeedz() << ',' << x.getLocationx() << ',' << x.getLocationy() << ',' <<x.getLocationz() << ',' << x.getEntryTime() << ')' << endl;
-		}
+		}*/
 
 	int screenSize[2];
 	ncursesSetup(screenSize);
@@ -38,12 +37,15 @@ int main(){
 	CommServer commServer;
 	Airspace airspace;
 	KeyboardListener keyboardListener(&airspace, &commServer, screenSize);
+	RadarListener radarListener(&airspace);
 
+	radarListener.run();
 	commServer.run();
 	pthread_join(keyboardListener.run(), NULL);
 	endwin();
 	fflush(stdout);
 	commServer.kill();
+	radarListener.kill();
 	return 0;
 }
 
@@ -55,7 +57,7 @@ void ncursesSetup(int screenSize[]){
 	curs_set(0);
 	getmaxyx(stdscr, screenSize[0], screenSize[1]);
 }
-
+/*
 void populateAirspace(string inputFile) {
 
 	string id, vx, vy, vz, x, y, z, eTime;
@@ -93,4 +95,4 @@ void populateAirspace(string inputFile) {
 	} else {
 		cout << "File could not open." << endl;
 	}
-}
+}*/
