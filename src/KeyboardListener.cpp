@@ -9,26 +9,24 @@
 #include "KeyboardListener.h"
 #include <ncurses.h>
 
-KeyboardListener::KeyboardListener(Airspace* airspace, CommServer* commServer, WINDOW* msg_win, int screenSize[], pthread_attr_t* threadAttr){
-	this->msg_win = msg_win;
+KeyboardListener::KeyboardListener(Airspace* airspace, CommServer* commServer, int screenSize[], pthread_attr_t* threadAttr){
 	this->airspace = airspace;
 	this->commserver = commServer;
 	this->threadAttr = threadAttr;
 	memcpy(this->screenSize, screenSize, sizeof(this->screenSize));
-	this->input_win = newwin(2, screenSize[1], screenSize[0]-3, 0);
+	this->input_win = newwin(3, this->screenSize[1], this->screenSize[0]-4, 0);
 }
 
 KeyboardListener::~KeyboardListener() {
 	this->kill();
 	pthread_attr_destroy(threadAttr);
-	delwin(input_win);
 }
 
-const pthread_t* KeyboardListener::run(){
+pthread_t KeyboardListener::run(){
 	if (pthread_create(&kbListener, threadAttr, (KBLISTENER_FUNC_PTR) &KeyboardListener::keyboardListener, this) == 0){
-		return &kbListener;
+		return kbListener;
 	} else
-		return nullptr;
+		return -1;
 }
 
 void* KeyboardListener::keyboardListener(void*){
@@ -36,9 +34,12 @@ void* KeyboardListener::keyboardListener(void*){
 	mvwprintw(input_win, 0, 0 , OPERATORCOMMANDS);
 	while(!killFlag){
 		c = wgetch(input_win);
-		wclear(msg_win);
-		wrefresh(msg_win);
+		wmove(input_win, 2, 0);
+		wclrtoeol(input_win);
+		wrefresh(input_win);
 		switch(c){
+			case ERR:
+				break;
 			case 'a':
 				altitude_change();
 				break;
@@ -49,15 +50,19 @@ void* KeyboardListener::keyboardListener(void*){
 				request_report();
 				break;
 			case 'q':
+				killFlag = true;
 				break;
 			default:
-				mvwprintw(msg_win, 0, 0, "Invalid command: '%c'", c);
-				wrefresh(msg_win);
+				mvwprintw(input_win, 2, 0, "Invalid command: '%c'", c);
+				wrefresh(input_win);
 				break;
 		}
-		if(c == 'q')	/* User asked to quit, come out of the infinite loop */
-			break;
 	}
+	wclear(input_win);
+	wrefresh(input_win);
+	wclear(stdscr);
+	wrefresh(stdscr);
+	delwin(input_win);
 	return nullptr;
 }
 
@@ -70,30 +75,55 @@ void KeyboardListener::altitude_change(){
 		parsed = wscanw(input_win,"%d", &ID);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid ID! "));
 
-	wprintw(msg_win, "New altitude for plane #%i:", ID);
-	wrefresh(msg_win);
+		// TODO Check ID against Airspace
+	} while (parsed == 0 && !wprintw(input_win, "Invalid ID! "));
+
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	int y, x;
+	mvwprintw(input_win, 2, 0, "New altitude for plane #%i:", ID);
+	wrefresh(input_win);
+	getyx(input_win, y, x);
 
 	parsed = 0;
 	int newAlt;
+	wmove(input_win, 1, 0);
 	do {
 		wprintw(input_win, "Enter new altitude: ");
 		parsed = wscanw(input_win,"%u", &newAlt);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid Altitude! "));
 
-	wprintw(msg_win, " %i", newAlt);
-	wrefresh(msg_win);
+		// TODO Check for out-of-bounds
+	} while (parsed == 0 && !wprintw(input_win, "Invalid Altitude! "));
+
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	mvwprintw(input_win, y, x, " %i", newAlt);
+	wrefresh(input_win);
+
 	if (confirm()){
+		wprintw(input_win, "Sending altitude change request to airplane #%i", ID);
 		std::stringstream content;
 		content << newAlt;
 		CommMessage altChangeMsg = CommMessage(ALTREQUEST, content.str(), ID);
 		commserver->send(altChangeMsg);
+
+		// TODO Change value in airspace
+
+		// TODO Write event to log
+	} else {
+		wprintw(input_win, "Request canceled");
 	}
-	wclear(msg_win);
-	wrefresh(msg_win);
+
+	wrefresh(input_win);
 }
 
 void KeyboardListener::speed_change(){
@@ -106,53 +136,90 @@ void KeyboardListener::speed_change(){
 		parsed = wscanw(input_win,"%d", &ID);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid ID! "));
 
-	wprintw(msg_win, "New velocity for plane #%i:{Vx,Vy,Vz}={ ", ID);
-	wrefresh(msg_win);
+		// TODO Check ID vs. airspace
+	} while (parsed == 0 && !wprintw(input_win, "Invalid ID! "));
+
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	mvwprintw(input_win, 2, 0, "New velocity for plane #%i:{Vx,Vy,Vz}={ ", ID);
+	wrefresh(input_win);
+	int y, x;
+	getyx(input_win, y, x);
 
 	parsed = 0;
 	int newVX;
+	wmove(input_win, 1, 0);
 	do {
 		wprintw(input_win, "Enter new X velocity: ");
 		parsed = wscanw(input_win,"%d", &newVX);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid speed! "));
 
-	wprintw(msg_win, " %i, ", newVX);
-	wrefresh(msg_win);
+		// TODO Check speed for ridiculous values
+	} while (parsed == 0 && !wprintw(input_win, "Invalid speed! "));
+
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	mvwprintw(input_win, y, x, " %i, ", newVX);
+	wrefresh(input_win);
+	getyx(input_win, y, x);
 
 	int newVY;
+	wmove(input_win, 1, 0);
 	do {
 		wprintw(input_win, "Enter new Y velocity: ");
 		parsed = wscanw(input_win,"%d", &newVY);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid speed! "));
+	} while (parsed == 0 && !wprintw(input_win, "Invalid speed! "));
 
-	wprintw(msg_win, " %i, ", newVY);
-	wrefresh(msg_win);
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	mvwprintw(input_win, y, x, " %i, ", newVY);
+	wrefresh(input_win);
+	getyx(input_win, y, x);
 
 	int newVZ;
+	wmove(input_win, 1, 0);
 	do {
 		wprintw(input_win, "Enter new Z velocity: ");
 		parsed = wscanw(input_win,"%d", &newVZ);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid speed! "));
+	} while (parsed == 0 && !wprintw(input_win, "Invalid speed! "));
 
-	wprintw(msg_win, " %i, ", newVZ);
-	wrefresh(msg_win);
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	mvwprintw(input_win, y, x, " %i, ", newVZ);
+	wrefresh(input_win);
 
 	if (confirm()){
+		wprintw(input_win, "Sending speed change request to airplane #%i", ID);
 		std::stringstream content;
 		content << newVX << ' ' << newVY << ' ' << newVZ;
 		CommMessage spdChangeMsg = CommMessage(SPDREQUEST, content.str(), ID);
 		commserver->send(spdChangeMsg);
+
+		// TODO change speed in airspace
+
+		// TODO write event to log
+	} else {
+		wprintw(input_win, "Request canceled");
 	}
-	wclear(msg_win);
-	wrefresh(msg_win);
+	wrefresh(input_win);
 }
 
 void KeyboardListener::request_report(){
@@ -165,21 +232,33 @@ void KeyboardListener::request_report(){
 		parsed = wscanw(input_win,"%d", &ID);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while (parsed != 1 && !wprintw(input_win, "Invalid ID! "));
 
-	wprintw(msg_win, "Requesting status report from plane #%i", ID);
-	wrefresh(msg_win);
+		// TODO Check ID vs. airspace
+	} while (parsed == 0 && !wprintw(input_win, "Invalid ID! "));
+
+	if (parsed == ERR){
+		inputTimeout();
+		return;
+	}
+
+	mvwprintw(input_win, 2, 0, "Requesting status report from plane #%i", ID);
+	wrefresh(input_win);
 
 	if (confirm()){
+		wprintw(input_win, "Sending report request to airplane #%i", ID);
 		CommMessage reportMsg = CommMessage(REPORT, " ", ID);
 		commserver->send(reportMsg);
+
+		// TODO Write event to log
+	} else {
+		wprintw(input_win, "Request canceled");
 	}
-	wclear(msg_win);
-	wrefresh(msg_win);
+	wrefresh(input_win);
 }
 
 void KeyboardListener::kill(){
 	killFlag = true;
+	//pthread_join(kbListener, NULL);
 }
 
 void KeyboardListener::readyInputWindow(){
@@ -188,16 +267,33 @@ void KeyboardListener::readyInputWindow(){
 	curs_set(2);
 	raw();
 	echo();
+	wtimeout(input_win, 5000);
+}
+
+void KeyboardListener::inputTimeout(){
+	wmove(input_win, 1 ,0);
+	wclrtoeol(input_win);
+	wmove(input_win, 2, 0);
+	wclrtoeol(input_win);
+	wrefresh(input_win);
+	cbreak();
+	curs_set(0);
+	noecho();
 }
 
 bool KeyboardListener::confirm(){
-	wmove(input_win, 1,0);
+	wmove(input_win, 1, 0);
 	wclrtoeol(input_win);
 	cbreak();
 	curs_set(0);
 	noecho();
 	wprintw(input_win, "Confirm request? y/n ");
-	int conf = wgetch(input_win);
+	int conf;
+	conf = wgetch(input_win);
+	wmove(input_win, 1, 0);
+	wclrtoeol(input_win);
+	wmove(input_win, 2, 0);
+	wclrtoeol(input_win);
 	if (conf == 'y'){
 		return true;
 	} else {
