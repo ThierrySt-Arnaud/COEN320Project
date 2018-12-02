@@ -35,6 +35,7 @@
 							<tool id="com.qnx.qcc.tool.archiver.1047501538" name="QCC Archiver" superClass="com.qnx.qcc.tool.archiver"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.qnx.qcc.toolChain.1792299710.819109792" name="RadarIn.txt" rcbsApplicability="disable" resourcePath="RadarIn.txt" toolsToInvoke=""/>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
