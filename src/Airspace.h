@@ -10,17 +10,23 @@
 
 #include <vector>
 #include "Hit.h"
+using namespace std;
 
 class Airspace {
 public:
+	vector<Hit> airspace;
 	Airspace();
 	virtual ~Airspace();
-	std::vector<Hit> addAircraft(std::vector<Hit>, Hit);
-	std::vector<Hit> remAircraft(std::vector<Hit> vector, int id);
-	std::vector<Hit> editAircraft(std::vector<Hit> vector, int id, int x, int y, int z);
-	void display(std::vector<Hit> vector);
-private:
-	std::vector<Hit> airspace;
+
+	vector<Hit> getAircrafts() { return airspace; }
+	Hit getAircraft();
+	void setAircraft() {}
+	void addAircraft(Hit hit) { airspace.push_back(hit); };
+	void removeAircraft(Hit hit);
+	void editAircraft(Hit hit);
+	int getSize();
+
+	//Add mutex and locks
 
 };
 
