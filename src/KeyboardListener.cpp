@@ -117,8 +117,7 @@ void KeyboardListener::altitude_change(){
 		CommMessage altChangeMsg = CommMessage(ALTREQUEST, content.str(), ID);
 		commserver->send(altChangeMsg);
 
-		// TODO Change value in airspace
-
+		airspace->chgAircraftAlt(ID, newAlt);
 		std::stringstream altChangeLog;
 		altChangeLog << "Sending altitude change request to airplane #" << ID;
 		CommMessage logMsg = CommMessage(LOG, altChangeLog.str(), 0);
@@ -217,7 +216,8 @@ void KeyboardListener::speed_change(){
 		CommMessage spdChangeMsg = CommMessage(SPDREQUEST, content.str(), ID);
 		commserver->send(spdChangeMsg);
 
-		// TODO change speed in airspace
+		int newSpd[3] = { newVX, newVY, newVZ };
+		airspace->chgAircraftSpd(ID, newSpd);
 
 		std::stringstream spdChangeLog;
 		spdChangeLog << "Sending speed change request to airplane #" << ID;

@@ -46,15 +46,38 @@ void Airspace::remAircraft(int id) {
 	pthread_mutex_unlock(&airspace_mutex);
 }
 
-//update speed function
+void Airspace::chgAircraftAlt(int id, int newAlt) {
+	pthread_mutex_lock(&airspace_mutex);
+	int match = 0;
+	for(Hit x : airspace) {
+		if(x.getId() == id) {
+			break;
+		} else {
+			match++;
+		}
+	}
+	airspace[match].setAlt(newAlt);
+	pthread_mutex_unlock(&airspace_mutex);
+}
 
-//update altitude function
-
+void Airspace::chgAircraftSpd(int id, int newSpd[]) {
+	pthread_mutex_lock(&airspace_mutex);
+	int match = 0;
+	for(Hit x : airspace) {
+		if(x.getId() == id) {
+			break;
+		} else {
+			match++;
+		}
+	}
+	airspace[match].setSpd(newSpd);
+	pthread_mutex_unlock(&airspace_mutex);
+}
 void Airspace::updateAircrafts() {
 
 	pthread_mutex_lock(&airspace_mutex);
 	for(Hit x : airspace) {
-		x.setData(x.getId(), x.getSpeedx(), x.getSpeedy(), x.getSpeedz(), x.getLocationx()+x.getSpeedx(), x.getLocationy()+x.getSpeedy(), x.getLocationz()+x.getSpeedz(), x.getEntryTime());
+		x.updateLocation();
 	}
 	pthread_mutex_unlock(&airspace_mutex);
 	/*for(Hit y : airspace) {

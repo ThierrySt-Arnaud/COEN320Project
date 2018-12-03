@@ -46,9 +46,8 @@ void *UpdateAirspace::update(void *) {
 		timeout.tv_sec += 1;
 		pthread_mutex_timedlock_monotonic(&updateMutex, &timeout);
 
-		vector<Hit> airspaceCpy = airspace->getAircrafts();
+		//vector<Hit> airspaceCpy = airspace->getAircrafts();
 	}
-	CommMessage logCollison(LOG, "Oh no! Collision!", 0);
 	return nullptr;
 }
 

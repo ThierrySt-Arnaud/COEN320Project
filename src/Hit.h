@@ -27,6 +27,29 @@ public:
 		locationz = z;
 		entryTime = eTime;
 		}
+
+	void setLocation( int newLoc[3]){
+		locationx = newLoc[0];
+		locationy = newLoc[1];
+		locationz = newLoc[2];
+	}
+
+	void setAlt( int newAlt){
+		locationz = newAlt;
+	}
+
+	void setSpd( int newSpd[3]){
+		speedx = newSpd[0];
+		speedy = newSpd[1];
+		speedz = newSpd[2];
+	}
+
+	void updateLocation(){
+		locationx += speedx;
+		locationy += speedy;
+		locationz += speedz;
+	}
+
 	int getId() {
 		return aircraft_id;
 	}
