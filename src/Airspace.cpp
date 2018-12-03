@@ -76,8 +76,8 @@ void Airspace::chgAircraftSpd(int id, int newSpd[]) {
 void Airspace::updateAircrafts() {
 
 	pthread_mutex_lock(&airspace_mutex);
-	for(Hit x : airspace) {
-		x.updateLocation();
+	for (unsigned i = 0; i < airspace.size(); i++){
+		airspace[i].updateLocation();
 	}
 	pthread_mutex_unlock(&airspace_mutex);
 	/*for(Hit y : airspace) {
