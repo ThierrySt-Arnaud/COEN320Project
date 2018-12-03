@@ -29,7 +29,6 @@ public:
 	void kill();
 private:
 	pthread_attr_t* threadAttr;
-	pthread_mutex_t outgoingMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_t commServer = false;
 	std::queue<CommMessage> outgoingQueue;
 	std::ofstream commOut;

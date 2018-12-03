@@ -25,11 +25,12 @@ public:
 	RadarListener(Airspace*, pthread_attr_t* = nullptr);
 	RadarListener(const RadarListener&) = delete;
 	virtual ~RadarListener();
-	const pthread_t* run();
+	pthread_t run();
 	void kill();
 private:
 	pthread_attr_t* threadAttr;
-	pthread_mutex_t outgoingMutex = PTHREAD_MUTEX_INITIALIZER;
+	pthread_mutex_t radarMutex;
+	pthread_mutexattr_t radarMutexAttr;
 	pthread_t radarListener = false;
 	Airspace* airspace;
 	atomic_bool killFlag = ATOMIC_VAR_INIT(false);

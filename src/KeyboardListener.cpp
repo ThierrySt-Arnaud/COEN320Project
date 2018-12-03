@@ -258,7 +258,6 @@ void KeyboardListener::request_report(){
 
 void KeyboardListener::kill(){
 	killFlag = true;
-	//pthread_join(kbListener, NULL);
 }
 
 void KeyboardListener::readyInputWindow(){

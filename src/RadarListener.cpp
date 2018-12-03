@@ -11,11 +11,15 @@
 #include <sstream>
 #include <iostream>
 #include <chrono>
+#include <time.h>
 using namespace std;
 
 RadarListener::RadarListener(Airspace* airspace, pthread_attr_t* threadAttr) {
 	this->airspace = airspace;
 	this->threadAttr = threadAttr;
+	pthread_mutexattr_init(&this->radarMutexAttr);
+	pthread_mutexattr_setprotocol(&this->radarMutexAttr,PTHREAD_PRIO_NONE);
+	pthread_mutex_init(&this->radarMutex, &this->radarMutexAttr);
 }
 
 RadarListener::~RadarListener() {
@@ -23,16 +27,17 @@ RadarListener::~RadarListener() {
 	pthread_attr_destroy(threadAttr);
 }
 
-const pthread_t* RadarListener::run() {
+pthread_t RadarListener::run() {
+	pthread_mutex_lock(&radarMutex);
 	if (pthread_create(&radarListener, threadAttr, (RADAR_FUNC_PTR) &RadarListener::populateAirspace, this) == 0){
-			return &radarListener;
+			return radarListener;
 		} else
-			return nullptr;
+			return -1;
 
 }
 
 void *RadarListener::populateAirspace(void *) {
-
+	struct timespec timeOut;
 	vector<Hit> hitList;
 	int timer = 0;
 	string id, vx, vy, vz, x, y, z, eTime;
@@ -72,6 +77,8 @@ void *RadarListener::populateAirspace(void *) {
 		cout << "File could not open." << endl;
 	}
 
+	inFile.close();
+
 	while(!killFlag) {
 
 		for(Hit x : hitList) {
@@ -96,8 +103,9 @@ void *RadarListener::populateAirspace(void *) {
 		for(Hit y : hitList) {
 			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
 		}
-		//sleep thread for 5 seconds
-		//replace with a real timer
+		clock_gettime(CLOCK_MONOTONIC, &timeOut);
+		timeOut.tv_sec += 5;
+		pthread_mutex_timedlock_monotonic(&radarMutex, &timeOut);
 		timer += 5;
 	}
 	return nullptr;
@@ -105,7 +113,6 @@ void *RadarListener::populateAirspace(void *) {
 
 void RadarListener::kill(){
 	killFlag = true;
-	pthread_sleepon_lock();
-	pthread_sleepon_unlock();
+	pthread_mutex_unlock(&radarMutex);
 	pthread_join(radarListener, NULL);
 }
