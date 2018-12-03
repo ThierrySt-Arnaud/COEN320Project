@@ -45,7 +45,7 @@ void AirspaceDisplay::kill(){
 void* AirspaceDisplay::displayRefresher(void *){
 	struct timespec timeout;
 	while (!killFlag){
-		vector<Hit>aircrafts = airspace->getAircrafts();
+		vector<Hit> aircrafts = airspace->getAircrafts();
 		wclear(display_win);
 		int curY = 0, curX = 0;
 		for(Hit h : aircrafts){

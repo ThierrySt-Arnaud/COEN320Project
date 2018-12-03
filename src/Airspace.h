@@ -24,6 +24,8 @@ public:
 	void addAircraft(Hit hit);
 	void remAircraft(int id);
 	void updateAircrafts();
+	void chgAircraftAlt(int, int);
+	void chgAircraftSpd(int, int[]);
 	int getSize();
 private:
 	vector<Hit> airspace;

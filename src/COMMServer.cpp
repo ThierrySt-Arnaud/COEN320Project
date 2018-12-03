@@ -78,7 +78,6 @@ void *CommServer::commSender(void *){
 			default:
 				commOut << "Invalid Message type!";
 		}
-		commOut << std::endl;
 	}
 
 	//When asked to quit, empty the outgoing queue
