@@ -17,6 +17,7 @@
 #include "CommServer.h"
 #include "RadarListener.h"
 #include "Airspace.h"
+#include "UpdateAirspace.h"
 #include "AirspaceDisplay.h"
 #include <sstream>
 #include <iostream>
@@ -40,10 +41,12 @@ int main(){
 	Airspace airspace;
 	KeyboardListener keyboardListener(&airspace, &commServer, screenSize);
 	RadarListener radarListener(&airspace);
+	UpdateAirspace updateAirspace(&airspace);
 	AirspaceDisplay airspaceDisplay(&airspace, screenSize);
 
 	airspaceDisplay.run();
 	radarListener.run();
+	updateAirspace.run();
 	commServer.run();
 	pthread_join(keyboardListener.run(), NULL);
 	airspaceDisplay.kill();
@@ -51,6 +54,7 @@ int main(){
 	fflush(stdout);
 	commServer.kill();
 	radarListener.kill();
+	updateAirspace.kill();
 	return 0;
 }
 

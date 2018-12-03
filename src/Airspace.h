@@ -22,8 +22,8 @@ public:
 	Hit getAircraft();
 	void setAircraft() {}
 	void addAircraft(Hit hit);
-	void removeAircraft(Hit hit);
-	void editAircraft(Hit hit);
+	void removeAircraft(int id);
+	void updateAircrafts();
 	int getSize();
 private:
 	vector<Hit> airspace;

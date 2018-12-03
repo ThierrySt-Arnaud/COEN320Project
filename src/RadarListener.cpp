@@ -89,9 +89,7 @@ void *RadarListener::populateAirspace(void *) {
 
 			if(x.getEntryTime() <= timer) {
 
-				if(x.getId() > 0) {
-					airspace->addAircraft(x);
-				}
+				airspace->addAircraft(x);
 				erase++;
 			}
 
