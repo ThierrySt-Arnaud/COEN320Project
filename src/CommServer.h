@@ -42,7 +42,7 @@ private:
 	void printAltRequest(int ID, std::string content);
 	void printHandoff(int ID);
 	void printLog(std::string content);
-	const char* timeStamp();
+	std::string timeStamp();
 };
 
 #endif /* COMMSERVER_H_ */

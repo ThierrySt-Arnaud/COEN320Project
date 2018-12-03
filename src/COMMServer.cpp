@@ -7,6 +7,7 @@
 
 #include "CommServer.h"
 #include <sstream>
+#include <string>
 #include <time.h>
 
 CommServer::CommServer(pthread_attr_t* threadAttr):
@@ -108,7 +109,7 @@ void *CommServer::commSender(void *){
 				commOut << "Invalid Message type!";
 		}
 	}
-	const char* tStamp =  timeStamp();
+	std::string tStamp =  timeStamp();
 	commOut <<  tStamp << "Communication output terminated" << std::endl;
 	log <<  tStamp << "Log terminated" << std::endl;
 	pthread_sleepon_unlock();
@@ -183,15 +184,18 @@ void CommServer::printLog(std::string content){
 	log << timeStamp() << content << std::endl;
 }
 
-const char* CommServer::timeStamp(){
-	char timeStamp[26];
+std::string CommServer::timeStamp(){
+	char buffer[26];
 	time_t rawtime;
 	struct tm * timeinfo;
 
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
 
-	strftime(timeStamp, sizeof(timeStamp),"%D %T - ",timeinfo);
+	strftime(buffer, sizeof(buffer),"%D %T - ",timeinfo);
+
+	std::string timeStamp(buffer, std::find(buffer, buffer + 26, '\0'));
+
 	return timeStamp;
 }
 

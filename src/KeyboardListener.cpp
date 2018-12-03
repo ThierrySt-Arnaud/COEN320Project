@@ -120,7 +120,7 @@ void KeyboardListener::altitude_change(){
 		// TODO Change value in airspace
 
 		std::stringstream altChangeLog;
-		altChangeLog << "Sending alt change request to airplane #" << ID;
+		altChangeLog << "Sending altitude change request to airplane #" << ID;
 		CommMessage logMsg = CommMessage(LOG, altChangeLog.str(), 0);
 		commserver->send(logMsg);
 	} else {
