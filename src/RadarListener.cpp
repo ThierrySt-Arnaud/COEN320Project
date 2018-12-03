@@ -30,10 +30,11 @@ RadarListener::~RadarListener() {
 pthread_t RadarListener::run() {
 	pthread_mutex_lock(&radarMutex);
 	if (pthread_create(&radarListener, threadAttr, (RADAR_FUNC_PTR) &RadarListener::populateAirspace, this) == 0){
-			return radarListener;
-		} else
-			return -1;
-
+		return radarListener;
+	} else {
+		pthread_mutex_unlock(&radarMutex);
+		return -1;
+	}
 }
 
 void *RadarListener::populateAirspace(void *) {
