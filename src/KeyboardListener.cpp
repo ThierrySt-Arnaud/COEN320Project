@@ -250,7 +250,10 @@ void KeyboardListener::request_report(){
 		wprintw(input_win, "Sending report request to airplane #%i", ID);
 		CommMessage reportMsg = CommMessage(REPORT, " ", ID);
 		commserver->send(reportMsg);
-		CommMessage logMsg = CommMessage(LOG, " ", 0);
+
+		std::stringstream report;
+		report << "Sending report request to airplane #" << ID;
+		CommMessage logMsg = CommMessage(LOG, report.str(), 0);
 		commserver->send(logMsg);
 	} else {
 		wprintw(input_win, "Request canceled");
