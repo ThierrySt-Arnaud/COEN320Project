@@ -15,12 +15,20 @@ Airspace::Airspace() {
 }
 
 Airspace::~Airspace() {
-	// TODO Auto-generated destructor stub
 }
 
 
-void addAircraft(Hit hit) {
+void Airspace::addAircraft(Hit hit) {
+	pthread_mutex_lock(&airspace_mutex);
+	airspace.push_back(hit);
+	pthread_mutex_unlock(&airspace_mutex);
+}
 
+vector<Hit> Airspace::getAircrafts(){
+	pthread_mutex_lock(&airspace_mutex);
+	vector<Hit> outputAirspace = airspace;
+	pthread_mutex_unlock(&airspace_mutex);
+	return outputAirspace;
 }
 
 void remAircraft(vector<Hit> vector, int id) {

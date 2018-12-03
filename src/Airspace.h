@@ -9,25 +9,25 @@
 #define AIRSPACE_H_
 
 #include <vector>
+#include <pthread.h>
 #include "Hit.h"
 using namespace std;
 
 class Airspace {
 public:
-	vector<Hit> airspace;
 	Airspace();
 	virtual ~Airspace();
 
-	vector<Hit> getAircrafts() { return airspace; }
+	vector<Hit> getAircrafts();
 	Hit getAircraft();
 	void setAircraft() {}
-	void addAircraft(Hit hit) { airspace.push_back(hit); };
+	void addAircraft(Hit hit);
 	void removeAircraft(Hit hit);
 	void editAircraft(Hit hit);
 	int getSize();
-
-	//Add mutex and locks
-
+private:
+	vector<Hit> airspace;
+	pthread_mutex_t airspace_mutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 #endif /* AIRSPACE_H_ */
