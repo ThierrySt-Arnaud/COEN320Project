@@ -31,23 +31,35 @@ vector<Hit> Airspace::getAircrafts(){
 	return outputAirspace;
 }
 
-void remAircraft(vector<Hit> vector, int id) {
+void Airspace::remAircraft(int id) {
 
-	/*for(unsigned int i=0; i<vector.size(); i++) {
-		if(vector[i].getId() == id) {
-			vector.erase(vector.begin()+i);
+	int erase = 0;
+	for(Hit x : airspace) {
+		if(x.getId() == id) {
+			break;
+		} else {
+			erase++;
 		}
-	}*/
+	}
+	pthread_mutex_lock(&airspace_mutex);
+	airspace.pop_back(airspace.begin()+erase);
+	pthread_mutex_unlock(&airspace_mutex);
 }
 
-void editAircraft(vector<Hit> vector, int id, int x, int y, int z) {
+//update speed function
 
-	/*for(unsigned int i=0; i<vector.size(); i++) {
-		if(vector[i].getId() == id) {
-			vector[i].setCoordinates(x, y, z);
-		}
+//update altitude function
+
+void Airspace::updateAircrafts() {
+
+	pthread_mutex_lock(&airspace_mutex);
+	for(Hit x : airspace) {
+		x.setData(x.getId(), x.getSpeedx(), x.getSpeedy(), x.getSpeedz(), x.getLocationx()+x.getSpeedx(), x.getLocationy()+x.getSpeedy(), x.getLocationz()+x.getSpeedz(), x.getEntryTime());
+	}
+	pthread_mutex_unlock(&airspace_mutex);
+	/*for(Hit y : airspace) {
+		cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
 	}*/
-
 }
 
 void display(vector<Hit> vector) {
