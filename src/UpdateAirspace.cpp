@@ -40,6 +40,7 @@ void *UpdateAirspace::update(void *) {
 	struct timespec timeout;
 
 	while(!killFlag) {
+
 		airspace->updateAircrafts();
 		clock_gettime(CLOCK_MONOTONIC, &timeout);
 		timeout.tv_sec += 1;
