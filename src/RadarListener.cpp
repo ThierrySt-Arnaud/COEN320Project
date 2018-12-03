@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <chrono>
 using namespace std;
 
 RadarListener::RadarListener(Airspace* airspace, pthread_attr_t* threadAttr) {
@@ -32,6 +33,8 @@ const pthread_t* RadarListener::run() {
 
 void *RadarListener::populateAirspace(void *) {
 
+	vector<Hit> hitList;
+	int timer = 0;
 	string id, vx, vy, vz, x, y, z, eTime;
 	int aircraft_id;
 	int i = 0;
@@ -60,12 +63,42 @@ void *RadarListener::populateAirspace(void *) {
 						aircraft_id = i;
 					}
 					hit.setData(aircraft_id, stoi(vx), stoi(vy), stoi(vz), stoi(x), stoi(y), stoi(z), stoi(eTime));
-					airspace->addAircraft(hit);
-					cout << '(' << id << ',' << vx << ',' << vy << ',' << vz << ',' << x << ',' << y << ',' << z << ',' << eTime << ')' << endl;
+					hitList.push_back(hit);
+					//airspace->addAircraft(hit);
+					//cout << '(' << id << ',' << vx << ',' << vy << ',' << vz << ',' << x << ',' << y << ',' << z << ',' << eTime << ')' << endl;
 				}
 		}
 	} else {
 		cout << "File could not open." << endl;
+	}
+
+	while(!killFlag) {
+
+		for(Hit x : hitList) {
+
+			cout << "\n\nENTRY_TIME: " << x.getEntryTime() << "\tTIMER: " << timer << endl;
+			int erase = 0;
+
+			if(x.getEntryTime() <= timer) {
+
+				if(x.getId() > 0) {
+					airspace->addAircraft(x);
+				}
+				erase++;
+			}
+
+			while(erase > 0) {
+				hitList.erase(hitList.begin());
+				erase--;
+			}
+		}
+
+		for(Hit y : hitList) {
+			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
+		}
+		//sleep thread for 5 seconds
+		//replace with a real timer
+		timer += 5;
 	}
 	return nullptr;
 }

@@ -19,6 +19,7 @@
 #include "Airspace.h"
 #include <sstream>
 #include <iostream>
+using namespace std;
 
 void ncursesSetup(int[]);
 //void populateAirspace(string);
