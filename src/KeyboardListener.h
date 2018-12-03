@@ -30,6 +30,7 @@ private:
 	pthread_t kbListener = false;
 	pthread_attr_t* threadAttr;
 	Airspace* airspace;
+	vector<Hit> airspaceCopy;
 	CommServer* commserver;
 	int screenSize[2];
 	std::atomic_bool killFlag = ATOMIC_VAR_INIT(false);
@@ -40,6 +41,7 @@ private:
 	void readyInputWindow();
 	void inputTimeout();
 	bool confirm();
+	bool checkID(int);
 };
 
 #endif /* KEYBOARDLISTENER_H_ */
