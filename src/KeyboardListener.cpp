@@ -119,7 +119,10 @@ void KeyboardListener::altitude_change(){
 
 		// TODO Change value in airspace
 
-		// TODO Write event to log
+		std::stringstream altChangeLog;
+		altChangeLog << "Sending alt change request to airplane #" << ID;
+		CommMessage logMsg = CommMessage(LOG, altChangeLog.str(), 0);
+		commserver->send(logMsg);
 	} else {
 		wprintw(input_win, "Request canceled");
 	}
@@ -216,7 +219,10 @@ void KeyboardListener::speed_change(){
 
 		// TODO change speed in airspace
 
-		// TODO write event to log
+		std::stringstream spdChangeLog;
+		spdChangeLog << "Sending speed change request to airplane #" << ID;
+		CommMessage logMsg = CommMessage(LOG, spdChangeLog.str(), 0);
+		commserver->send(logMsg);
 	} else {
 		wprintw(input_win, "Request canceled");
 	}
