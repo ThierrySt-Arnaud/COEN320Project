@@ -17,6 +17,7 @@
 #include "CommServer.h"
 #include "RadarListener.h"
 #include "Airspace.h"
+#include "AirspaceDisplay.h"
 #include <sstream>
 #include <iostream>
 using namespace std;
@@ -39,10 +40,13 @@ int main(){
 	Airspace airspace;
 	KeyboardListener keyboardListener(&airspace, &commServer, screenSize);
 	RadarListener radarListener(&airspace);
+	AirspaceDisplay airspaceDisplay(&airspace, screenSize);
 
+	airspaceDisplay.run();
 	radarListener.run();
 	commServer.run();
 	pthread_join(keyboardListener.run(), NULL);
+	airspaceDisplay.kill();
 	endwin();
 	fflush(stdout);
 	commServer.kill();

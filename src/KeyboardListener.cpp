@@ -280,6 +280,7 @@ void KeyboardListener::inputTimeout(){
 	noecho();
 }
 
+
 bool KeyboardListener::confirm(){
 	wmove(input_win, 1, 0);
 	wclrtoeol(input_win);

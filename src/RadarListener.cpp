@@ -30,10 +30,11 @@ RadarListener::~RadarListener() {
 pthread_t RadarListener::run() {
 	pthread_mutex_lock(&radarMutex);
 	if (pthread_create(&radarListener, threadAttr, (RADAR_FUNC_PTR) &RadarListener::populateAirspace, this) == 0){
-			return radarListener;
-		} else
-			return -1;
-
+		return radarListener;
+	} else {
+		pthread_mutex_unlock(&radarMutex);
+		return -1;
+	}
 }
 
 void *RadarListener::populateAirspace(void *) {
@@ -83,7 +84,7 @@ void *RadarListener::populateAirspace(void *) {
 
 		for(Hit x : hitList) {
 
-			cout << "\n\nENTRY_TIME: " << x.getEntryTime() << "\tTIMER: " << timer << endl;
+			//cout << "\n\nENTRY_TIME: " << x.getEntryTime() << "\tTIMER: " << timer << endl;
 			int erase = 0;
 
 			if(x.getEntryTime() <= timer) {
@@ -100,9 +101,9 @@ void *RadarListener::populateAirspace(void *) {
 			}
 		}
 
-		for(Hit y : hitList) {
+		/*for(Hit y : hitList) {
 			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
-		}
+		}*/
 		clock_gettime(CLOCK_MONOTONIC, &timeOut);
 		timeOut.tv_sec += 5;
 		pthread_mutex_timedlock_monotonic(&radarMutex, &timeOut);
