@@ -38,19 +38,26 @@ void *UpdateAirspace::update(void *) {
 	struct timespec timeout;
 
 	while(!killFlag) {
-		for(Hit x : airspace->getAircrafts()) {
-			x.setData(x.getId(), x.getSpeedx(), x.getSpeedy(), x.getSpeedz(), x.getLocationx()+x.getSpeedx(), x.getLocationy()+x.getSpeedy(), x.getLocationz()+x.getSpeedz(), x.getEntryTime());
-		}
-		for(Hit y : airspace->getAircrafts()) {
-			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
-		}
+		airspace->updateAircrafts();
 		clock_gettime(CLOCK_MONOTONIC, &timeout);
 		timeout.tv_sec += 1;
 		pthread_mutex_timedlock_monotonic(&updateMutex, &timeout);
-	}
 
+		vector<Hit> airspaceCpy = airspace->getAircrafts();
+	}
+	CommMessage logCollison(LOG, "Oh no! Collision!", 0);
 	return nullptr;
 }
+
+//create function for out of bounds check
+void UpdateAirspace::outOfBounds() {
+
+	for(Hit x : airspace) {
+
+	}
+}
+
+//create function for collision check
 
 void UpdateAirspace::kill(){
 	killFlag = true;
