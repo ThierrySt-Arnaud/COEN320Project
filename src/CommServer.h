@@ -15,6 +15,7 @@
 #include "CommMessage.h"
 
 #define COMM_OUT "/home/qnxuser/ATC/CommOut.txt"
+#define LOG_OUT "/home/qnxuser/ATC/Log.txt"
 
 typedef void * (*COMMSERVER_FUNC_PTR)(void *);
 
@@ -28,16 +29,20 @@ public:
 	void send(CommMessage);
 	void kill();
 private:
+	time_t clk;
 	pthread_attr_t* threadAttr;
 	pthread_t commServer = false;
 	std::queue<CommMessage> outgoingQueue;
 	std::ofstream commOut;
+	std::ofstream log;
 	std::atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void *commSender(void *);
 	void printReport(int ID);
 	void printSpdRequest(int ID, std::string content);
 	void printAltRequest(int ID, std::string content);
 	void printHandoff(int ID);
+	void printLog(std::string content);
+	const char* timeStamp();
 };
 
 #endif /* COMMSERVER_H_ */

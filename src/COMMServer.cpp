@@ -7,17 +7,23 @@
 
 #include "CommServer.h"
 #include <sstream>
+#include <time.h>
 
-CommServer::CommServer(pthread_attr_t* threadAttr): commOut(COMM_OUT, std::fstream::out | std::fstream::trunc){
+CommServer::CommServer(pthread_attr_t* threadAttr):
+commOut(COMM_OUT, std::fstream::out | std::fstream::trunc),
+log(LCOMM_OUT, std::fstream::out | std::fstream::trunc ){
 	this->threadAttr = threadAttr;
 	this->outgoingQueue = std::queue<CommMessage>();
-	commOut << "Communication channel open" << std::endl;
+	commOut <<  timeStamp() << "Communication channel open" << std::endl;
+	log << timeStamp() << "Log file open" << std::endl
+	this->clk = time(Null);
 }
 
 CommServer::~CommServer(){
 	this->kill();
 	pthread_attr_destroy(threadAttr);
 	this->commOut.close();
+	this->log.close();
 }
 
 pthread_t CommServer::run(){
@@ -35,7 +41,7 @@ void CommServer::send(CommMessage message){
 }
 
 void *CommServer::commSender(void *){
-	commOut << "Output thread ready" << std::endl;
+	commOut <<  timeStamp() << "Output thread ready" << std::endl;
 	while (!killFlag){
 		pthread_sleepon_lock();
 		while (!killFlag && outgoingQueue.empty()){
@@ -66,6 +72,9 @@ void *CommServer::commSender(void *){
 			case HANDOFF:
 				printHandoff(remoteID);
 				break;
+			case LOG:
+				printLog(content);
+				break;
 			default:
 				commOut << "Invalid Message type!";
 		}
@@ -93,17 +102,23 @@ void *CommServer::commSender(void *){
 			case HANDOFF:
 				printHandoff(remoteID);
 				break;
+			case LOG:
+				printLog(content);
+				break;
 			default:
 				commOut << "Invalid Message type!";
 		}
-		commOut << std::endl;
 	}
-	commOut << "Communication output terminated" << std::endl;
+	const char* tStamp =  timeStamp();
+	commOut <<  tStamp << "Communication output terminated" << std::endl;
+	log <<  tStamp << "Log terminated" << std::endl;
 	pthread_sleepon_unlock();
 	return nullptr;
 }
 
 void CommServer::printReport(int ID){
+	commOut << timeStamp();
+
 	commOut << "Report request sent to ";
 	if (ID < 0){
 		commOut << "unidentified plane " << abs(ID) << "." ;
@@ -112,9 +127,12 @@ void CommServer::printReport(int ID){
 	} else {
 		commOut << "all airplanes in airspace.";
 	}
+	commOut << std::endl;
 }
 
 void CommServer::printSpdRequest(int ID, std::string content){
+	commOut << timeStamp();
+
 	std::stringstream parsingBuffer = std::stringstream(content, std::iostream::in);
 	int vx, vy, vz;
 	parsingBuffer >> vx >> vy >> vz;
@@ -129,9 +147,12 @@ void CommServer::printSpdRequest(int ID, std::string content){
 		commOut << "Requesting all planes change speed to:\n"
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	}
+	commOut << std::endl;
 }
 
 void CommServer::printAltRequest(int ID, std::string content){
+	commOut << timeStamp();
+
 	std::stringstream parsingBuffer = std::stringstream(content, std::iostream::in);
 	int z ;
 	parsingBuffer >> z;
@@ -143,9 +164,12 @@ void CommServer::printAltRequest(int ID, std::string content){
 	} else {
 		commOut << "Requesting all planes changes to altitude to:" << z << " feet.";
 	}
+	commOut << std::endl;
 }
 
 void CommServer::printHandoff(int ID){
+	commOut << timeStamp();
+
 	if (ID < 0){
 		commOut << "Unidentified plane " << abs(ID) << " is leaving the airspace." ;
 	} else if (ID > 0){
@@ -153,6 +177,23 @@ void CommServer::printHandoff(int ID){
 	} else {
 		commOut << "All planes in the airspace are leaving!";
 	}
+	commOut << std::endl;
+}
+
+void CommServer::printLog(std::string content){
+	log << timeStamp() << content << std::endl;
+}
+
+const char* CommServer::timeStamp(){
+	char timeStamp[26];
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+
+	strftime(timeStamp, sizeof(timeStamp),"%D %T - ",timeinfo);
+	return timeStamp;
 }
 
 void CommServer::kill(){

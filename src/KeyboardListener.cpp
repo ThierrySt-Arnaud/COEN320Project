@@ -6,6 +6,7 @@
  */
 
 #include <sstream>
+#include <string>
 #include "KeyboardListener.h"
 #include <ncurses.h>
 
@@ -245,11 +246,12 @@ void KeyboardListener::request_report(){
 	wrefresh(input_win);
 
 	if (confirm()){
+
 		wprintw(input_win, "Sending report request to airplane #%i", ID);
 		CommMessage reportMsg = CommMessage(REPORT, " ", ID);
 		commserver->send(reportMsg);
-
-		// TODO Write event to log
+		CommMessage logMsg = CommMessage(LOG, " ", 0);
+		commserver->send(logMsg);
 	} else {
 		wprintw(input_win, "Request canceled");
 	}

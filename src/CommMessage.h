@@ -10,7 +10,7 @@
 
 #include <string>
 
-enum CommMsgType { REPORT, SPDREQUEST, ALTREQUEST, HANDOFF };
+enum CommMsgType { REPORT, SPDREQUEST, ALTREQUEST, HANDOFF, LOG };
 
 class CommMessage{
 public:
