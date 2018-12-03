@@ -42,7 +42,7 @@ void Airspace::remAircraft(int id) {
 		}
 	}
 	pthread_mutex_lock(&airspace_mutex);
-	airspace.pop_back(airspace.begin()+erase);
+	airspace.erase(airspace.begin()+erase);
 	pthread_mutex_unlock(&airspace_mutex);
 }
 

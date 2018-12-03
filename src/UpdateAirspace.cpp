@@ -8,14 +8,16 @@
 #include <iostream>
 #include <time.h>
 #include "UpdateAirspace.h"
+#include "CommServer.h"
 #include "Hit.h"
 
 using namespace std;
 
 
-UpdateAirspace::UpdateAirspace(Airspace* airspace, pthread_attr_t* threadAttr) {
+UpdateAirspace::UpdateAirspace(Airspace* airspace, CommServer* commServer, pthread_attr_t* threadAttr) {
 	this->airspace = airspace;
 	this->threadAttr = threadAttr;
+	this->commServer = commServer;
 	pthread_mutexattr_init(&this->updateMutexAttr);
 	pthread_mutexattr_setprotocol(&this->updateMutexAttr,PTHREAD_PRIO_NONE);
 	pthread_mutex_init(&this->updateMutex, &this->updateMutexAttr);
@@ -52,9 +54,6 @@ void *UpdateAirspace::update(void *) {
 //create function for out of bounds check
 void UpdateAirspace::outOfBounds() {
 
-	for(Hit x : airspace) {
-
-	}
 }
 
 //create function for collision check

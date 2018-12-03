@@ -15,7 +15,7 @@ log(LOG_OUT, std::fstream::out | std::fstream::trunc ){
 	this->threadAttr = threadAttr;
 	this->outgoingQueue = std::queue<CommMessage>();
 	commOut <<  timeStamp() << "Communication channel open" << std::endl;
-	log << timeStamp() << "Log file open" << std::endl
+	log << timeStamp() << "Log file open" << std::endl;
 }
 
 CommServer::~CommServer(){

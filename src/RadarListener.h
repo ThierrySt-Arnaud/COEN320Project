@@ -14,6 +14,7 @@
 #include <queue>
 #include <string>
 #include "Airspace.h"
+#include "CommServer.h"
 using namespace std;
 
 typedef void * (*RADAR_FUNC_PTR)(void *);
@@ -22,7 +23,7 @@ typedef void * (*RADAR_FUNC_PTR)(void *);
 
 class RadarListener {
 public:
-	RadarListener(Airspace*, pthread_attr_t* = nullptr);
+	RadarListener(Airspace*, CommServer*, pthread_attr_t* = nullptr);
 	RadarListener(const RadarListener&) = delete;
 	virtual ~RadarListener();
 	pthread_t run();
@@ -33,6 +34,7 @@ private:
 	pthread_mutexattr_t radarMutexAttr;
 	pthread_t radarListener = false;
 	Airspace* airspace;
+	CommServer* commServer;
 	atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void *populateAirspace(void *);
 };

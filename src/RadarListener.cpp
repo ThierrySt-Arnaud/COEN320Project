@@ -6,6 +6,7 @@
  */
 
 #include "RadarListener.h"
+#include "CommServer.h"
 #include "Hit.h"
 #include <string>
 #include <sstream>
@@ -14,9 +15,10 @@
 #include <time.h>
 using namespace std;
 
-RadarListener::RadarListener(Airspace* airspace, pthread_attr_t* threadAttr) {
+RadarListener::RadarListener(Airspace* airspace, CommServer* commServer, pthread_attr_t* threadAttr) {
 	this->airspace = airspace;
 	this->threadAttr = threadAttr;
+	this->commServer = commServer;
 	pthread_mutexattr_init(&this->radarMutexAttr);
 	pthread_mutexattr_setprotocol(&this->radarMutexAttr,PTHREAD_PRIO_NONE);
 	pthread_mutex_init(&this->radarMutex, &this->radarMutexAttr);
@@ -90,6 +92,10 @@ void *RadarListener::populateAirspace(void *) {
 			if(x.getEntryTime() <= timer) {
 
 				airspace->addAircraft(x);
+				stringstream newLog;
+				newLog << "Plane " << x.getId() << " added to airspace";
+				CommMessage logNewPlane(LOG, newLog.str(), x.getId());
+				commServer->send(logNewPlane);
 				erase++;
 			}
 

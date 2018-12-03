@@ -13,13 +13,14 @@
 #include <atomic>
 #include <string>
 #include "Airspace.h"
+#include "CommServer.h"
 using namespace std;
 
 typedef void * (*UPDATE_FUNC_PTR)(void *);
 
 class UpdateAirspace {
 public:
-	UpdateAirspace(Airspace*, pthread_attr_t* = nullptr);
+	UpdateAirspace(Airspace*, CommServer*, pthread_attr_t* = nullptr);
 	UpdateAirspace(const UpdateAirspace&) = delete;
 	virtual ~UpdateAirspace();
 	pthread_t run();
@@ -30,8 +31,10 @@ private:
 	pthread_mutexattr_t updateMutexAttr;
 	pthread_t updateAirspace = false;
 	Airspace* airspace;
+	CommServer* commServer;
 	atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void *update(void *);
+	void outOfBounds();
 };
 
 #endif /* SRC_UPDATEAIRSPACE_H_ */

@@ -22,7 +22,7 @@ public:
 	Hit getAircraft();
 	void setAircraft() {}
 	void addAircraft(Hit hit);
-	void removeAircraft(int id);
+	void remAircraft(int id);
 	void updateAircrafts();
 	int getSize();
 private:

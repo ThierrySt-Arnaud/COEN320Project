@@ -33,8 +33,8 @@ int main(){
 	CommServer commServer;
 	Airspace airspace;
 	KeyboardListener keyboardListener(&airspace, &commServer, screenSize);
-	RadarListener radarListener(&airspace);
-	UpdateAirspace updateAirspace(&airspace);
+	RadarListener radarListener(&airspace, &commServer);
+	UpdateAirspace updateAirspace(&airspace, &commServer);
 	AirspaceDisplay airspaceDisplay(&airspace, screenSize);
 
 	airspaceDisplay.run();
