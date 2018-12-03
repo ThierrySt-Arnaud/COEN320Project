@@ -8,10 +8,9 @@
 #ifndef SRC_UPDATEAIRSPACE_H_
 #define SRC_UPDATEAIRSPACE_H_
 
-#include <fstream>
+
 #include <pthread.h>
 #include <atomic>
-#include <queue>
 #include <string>
 #include "Airspace.h"
 using namespace std;

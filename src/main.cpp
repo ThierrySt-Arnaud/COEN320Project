@@ -50,6 +50,7 @@ int main(){
 	fflush(stdout);
 	commServer.kill();
 	radarListener.kill();
+	updateAirspace.kill();
 	return 0;
 }
 
