@@ -33,7 +33,8 @@ vector<Hit> Airspace::getAircrafts(){
 
 void Airspace::remAircraft(int id) {
 
-	int erase = 0;
+	int erase = -1;
+	pthread_mutex_lock(&airspace_mutex);
 	for(Hit x : airspace) {
 		if(x.getId() == id) {
 			break;
@@ -41,9 +42,13 @@ void Airspace::remAircraft(int id) {
 			erase++;
 		}
 	}
-	pthread_mutex_lock(&airspace_mutex);
-	airspace.erase(airspace.begin()+erase);
+	if (erase > -1){
+		airspace.erase(airspace.begin()+erase);
+	}
 	pthread_mutex_unlock(&airspace_mutex);
+	/*for(Hit y : airspace) {
+			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
+		}*/
 }
 
 void Airspace::chgAircraftAlt(int id, int newAlt) {

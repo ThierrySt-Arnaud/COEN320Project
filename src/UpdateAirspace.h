@@ -17,9 +17,9 @@
 using namespace std;
 
 typedef void * (*UPDATE_FUNC_PTR)(void *);
-const int MAX_X = 150000;
-const int MAX_Y = 50000;
-const int MAX_Z = 150000;
+const int MAX_X = 100000;
+const int MAX_Y = 100000;
+const int MAX_Z = 25000;
 
 //100 000 x 100 000 x 25 000
 
