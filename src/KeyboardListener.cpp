@@ -79,7 +79,7 @@ void KeyboardListener::altitude_change(){
 		wclrtoeol(input_win);
 
 		// TODO Check ID against Airspace
-	} while ((parsed == 0 || checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
+	} while ((parsed == 0 || !checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
 
 	if (parsed == ERR){
 		inputTimeout();
@@ -140,7 +140,7 @@ void KeyboardListener::speed_change(){
 		parsed = wscanw(input_win,"%d", &ID);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while ((parsed == 0 || checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
+	} while ((parsed == 0 || !checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
 
 	if (parsed == ERR){
 		inputTimeout();
@@ -239,7 +239,7 @@ void KeyboardListener::request_report(){
 		parsed = wscanw(input_win,"%d", &ID);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-	} while ((parsed == 0 || checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
+	} while ((parsed == 0 || !checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
 
 	if (parsed == ERR){
 		inputTimeout();
