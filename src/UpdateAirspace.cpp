@@ -45,14 +45,26 @@ void *UpdateAirspace::update(void *) {
 		clock_gettime(CLOCK_MONOTONIC, &timeout);
 		timeout.tv_sec += 1;
 		pthread_mutex_timedlock_monotonic(&updateMutex, &timeout);
+		outOfBounds();
 
-		//vector<Hit> airspaceCpy = airspace->getAircrafts();
 	}
 	return nullptr;
 }
 
 //create function for out of bounds check
 void UpdateAirspace::outOfBounds() {
+
+	vector<int> outOfBoundsAricrafts;
+	vector<Hit> airspaceCpy = airspace->getAircrafts();
+	for(Hit x : airspaceCpy) {
+		if(x.getLocationx() > MAX_X || x.getLocationx() < 0 || x.getLocationy() > MAX_Y || x.getLocationy() < 0 || x.getLocationz() > MAX_Z || x.getLocationz() < 0) {
+			outOfBoundsAricrafts.push_back(x.getId());
+		}
+	}
+
+	for(int i : outOfBoundsAricrafts) {
+		airspace->remAircraft(i);
+	}
 
 }
 
