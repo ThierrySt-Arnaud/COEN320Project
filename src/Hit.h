@@ -7,83 +7,35 @@
 
 #ifndef HIT_H_
 #define HIT_H_
-#include "Coordinates.h"
+#include <array>
 using namespace std;
 
-class Hit : public Coordinates {
+class Hit{
 public:
 	//Default constructor
-	Hit();
+	Hit(int, int, int, int, int, int, int, int);
 	//Destructor
 	~Hit();
 	//Getters
-	void setData(int id, int vx, int vy, int vz, int x, int y, int z, int eTime) {
-		aircraft_id = id;
-		speedx = vx;
-		speedy = vy;
-		speedz = vz;
-		locationx = x;
-		locationy = y;
-		locationz = z;
-		entryTime = eTime;
-		}
-
-	void setLocation( int newLoc[3]){
-		locationx = newLoc[0];
-		locationy = newLoc[1];
-		locationz = newLoc[2];
-	}
-
-	void setAlt( int newAlt){
-		locationz = newAlt;
-	}
-
-	void setSpd( int newSpd[3]){
-		speedx = newSpd[0];
-		speedy = newSpd[1];
-		speedz = newSpd[2];
-	}
-
-	void updateLocation(){
-		locationx += speedx;
-		locationy += speedy;
-		locationz += speedz;
-	}
-
-	int getId() {
-		return aircraft_id;
-	}
-	int getSpeedx() {
-		return speedx;
-	}
-	int getSpeedy() {
-		return speedy;
-	}
-	int getSpeedz() {
-		return speedz;
-	}
-	int getLocationx() {
-		return locationx;
-	}
-	int getLocationy() {
-		return locationy;
-	}
-	int getLocationz() {
-		return locationz;
-	}
-	int getEntryTime() {
-		return entryTime;
-	}
+	void setLocation(std::array<int, 3>);
+	void setAlt(int);
+	void setSpd(std::array<int, 3>);
+	void setCollision(int);
+	void updateLocation();
+	int getId();
+	std::array<int, 3> getSpeed();
+	std::array<int, 3> getLocation();
+	bool colliding();
+	int getCollider();
+	int getEntryTime();
 
 private:
 	//Hit variables
 	int aircraft_id;
-	int speedx;
-	int speedy;
-	int speedz;
-	int locationx;
-	int locationy;
-	int locationz;
+	std::array<int, 3> speed;
+	std::array<int, 3> location;
+	bool collidingFlag;
+	int collider;
 	int entryTime;
 };
 

@@ -11,7 +11,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include <chrono>
+#include <queue>
 #include <time.h>
 using namespace std;
 
@@ -41,12 +41,11 @@ pthread_t RadarListener::run() {
 
 void *RadarListener::populateAirspace(void *) {
 	struct timespec timeOut;
-	vector<Hit> hitList;
+	queue<Hit> hitList;
 	int timer = 0;
 	string id, vx, vy, vz, x, y, z, eTime;
 	int aircraft_id;
 	int i = 0;
-	Hit hit;
 	string line;
 	ifstream inFile;
 	inFile.open(INPUT_FILE, ios::in);
@@ -70,8 +69,8 @@ void *RadarListener::populateAirspace(void *) {
 						i--;
 						aircraft_id = i;
 					}
-					hit.setData(aircraft_id, stoi(vx), stoi(vy), stoi(vz), stoi(x), stoi(y), stoi(z), stoi(eTime));
-					hitList.push_back(hit);
+					Hit hit(aircraft_id, stoi(vx), stoi(vy), stoi(vz), stoi(x), stoi(y), stoi(z), stoi(eTime));
+					hitList.push(hit);
 					//airspace->addAircraft(hit);
 					//cout << '(' << id << ',' << vx << ',' << vy << ',' << vz << ',' << x << ',' << y << ',' << z << ',' << eTime << ')' << endl;
 				}
@@ -84,30 +83,26 @@ void *RadarListener::populateAirspace(void *) {
 
 	while(!killFlag) {
 
-		for(Hit x : hitList) {
-
-			//cout << "\n\nENTRY_TIME: " << x.getEntryTime() << "\tTIMER: " << timer << endl;
-			int erase = 0;
-
-			if(x.getEntryTime() <= timer) {
-
-				airspace->addAircraft(x);
+		while(!hitList.empty()) {
+			Hit front = hitList.front();
+			int ET = timer - front.getEntryTime();
+			if(ET > 0) {
+				std::array<int, 3> spd = front.getSpeed();
+				std::array<int, 3> loc = front.getLocation();
+				loc[0] += ET*spd[0]; loc[1] += ET*spd[1]; loc[2] += ET*spd[2];
+				front.setLocation(loc);
+				airspace->addAircraft(front);
 				stringstream newLog;
-				newLog << "Plane " << x.getId() << " added to airspace";
-				CommMessage logNewPlane(LOG, newLog.str(), x.getId());
+				newLog << "Flight #" << front.getId() << " entered the airspace";
+				CommMessage logNewPlane(LOG, newLog.str(), front.getId());
 				commServer->send(logNewPlane);
-				erase++;
+				hitList.pop();
 			}
-
-			while(erase > 0) {
-				hitList.erase(hitList.begin());
-				erase--;
+			else{
+				break;
 			}
 		}
 
-		/*for(Hit y : hitList) {
-			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
-		}*/
 		clock_gettime(CLOCK_MONOTONIC, &timeOut);
 		timeOut.tv_sec += 5;
 		pthread_mutex_timedlock_monotonic(&radarMutex, &timeOut);

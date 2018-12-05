@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
 #include "Airspace.h"
 #include "AirspaceDisplay.h"
 
@@ -49,6 +50,9 @@ void* AirspaceDisplay::displayRefresher(void *){
 		wclear(display_win);
 		int curY = 0, curX = 0;
 		for(Hit h : aircrafts){
+			if (h.colliding()){
+				wattron(display_win, COLOR_PAIR(1) | A_BLINK );
+			}
 			int ID = h.getId();
 			char* idStatus;
 			if (ID < 0){
@@ -57,10 +61,10 @@ void* AirspaceDisplay::displayRefresher(void *){
 			} else {
 				idStatus = "Flight";
 			}
-			int x = h.getLocationx(), y = h.getLocationy(), z = h.getLocationz(),
-					vx = h.getSpeedx(), vy = h.getSpeedy(), vz = h.getSpeedz();
+			std::array<int, 3> loc = h.getLocation(), spd = h.getSpeed();
 			mvwprintw(display_win, curY++, curX ,"%s #%i Pos: %i, %i, %i Spd: %i, %i, %i",
-					  idStatus, ID, x, y, z, vx, vy, vz);
+					  idStatus, ID, loc[0], loc[1], loc[2], spd[0], spd[1], spd[2]);
+			wstandend(display_win);
 		}
 		wrefresh(display_win);
 		clock_gettime(CLOCK_MONOTONIC, &timeout);

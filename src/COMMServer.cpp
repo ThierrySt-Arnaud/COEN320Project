@@ -137,13 +137,13 @@ void CommServer::printSpdRequest(int ID, std::string content){
 	parsingBuffer >> vx >> vy >> vz;
 
 	if (ID < 0){
-		commOut << "Requesting unidentified plane " << abs(ID) << " change speed to:\n"
+		commOut << "Requesting unidentified plane " << abs(ID) << " change speed to: "
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	} else if (ID > 0){
-		commOut << "Requesting airplane " << ID << " change speed to:\n"
+		commOut << "Requesting airplane " << ID << " change speed to: "
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	} else {
-		commOut << "Requesting all planes change speed to:\n"
+		commOut << "Requesting all planes change speed to: "
 				<< "VX: " << vx << " VY: " << vy << " VZ: " << vz;
 	}
 	commOut << std::endl;

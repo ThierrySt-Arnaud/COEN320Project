@@ -6,7 +6,6 @@
  */
 
 #include "Airspace.h"
-#include <iostream>
 using namespace std;
 
 Airspace::Airspace() {
@@ -20,80 +19,61 @@ Airspace::~Airspace() {
 
 void Airspace::addAircraft(Hit hit) {
 	pthread_mutex_lock(&airspace_mutex);
-	airspace.push_back(hit);
+	airspace.insert(std::pair<int, Hit>(hit.getId(), hit));
 	pthread_mutex_unlock(&airspace_mutex);
 }
 
 vector<Hit> Airspace::getAircrafts(){
+	vector<Hit> outputAirspace;
 	pthread_mutex_lock(&airspace_mutex);
-	vector<Hit> outputAirspace = airspace;
+	for (const auto &s: airspace){
+		outputAirspace.push_back(s.second);
+	}
 	pthread_mutex_unlock(&airspace_mutex);
 	return outputAirspace;
 }
 
 void Airspace::remAircraft(int id) {
-
-	int erase = -1;
 	pthread_mutex_lock(&airspace_mutex);
-	for(Hit x : airspace) {
-		if(x.getId() == id) {
-			break;
-		} else {
-			erase++;
-		}
-	}
-	if (erase > -1){
-		airspace.erase(airspace.begin()+erase);
-	}
+	airspace.erase(id);
 	pthread_mutex_unlock(&airspace_mutex);
-	/*for(Hit y : airspace) {
-			cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
-		}*/
 }
 
 void Airspace::chgAircraftAlt(int id, int newAlt) {
 	pthread_mutex_lock(&airspace_mutex);
-	int match = 0;
-	for(Hit x : airspace) {
-		if(x.getId() == id) {
-			break;
-		} else {
-			match++;
-		}
+	try{
+		airspace.at(id).setAlt(newAlt);
+	} catch(std::out_of_range& e){
+		// The ID wasn't found, but we don't care
 	}
-	airspace[match].setAlt(newAlt);
 	pthread_mutex_unlock(&airspace_mutex);
 }
 
-void Airspace::chgAircraftSpd(int id, int newSpd[]) {
+void Airspace::chgAircraftSpd(int id, std::array<int, 3> newSpd) {
 	pthread_mutex_lock(&airspace_mutex);
-	int match = 0;
-	for(Hit x : airspace) {
-		if(x.getId() == id) {
-			break;
-		} else {
-			match++;
-		}
+	try{
+		airspace.at(id).setSpd(newSpd);
+	} catch(std::out_of_range& e){
+		// The ID wasn't found, but we don't care
 	}
-	airspace[match].setSpd(newSpd);
 	pthread_mutex_unlock(&airspace_mutex);
 }
+
+void Airspace::setColliding(int id, int collider){
+	pthread_mutex_lock(&airspace_mutex);
+	try{
+		airspace.at(id).setCollision(collider);
+		airspace.at(collider).setCollision(id);
+	} catch(std::out_of_range& e){
+		// The ID wasn't found, but we don't care
+	}
+	pthread_mutex_unlock(&airspace_mutex);
+}
+
 void Airspace::updateAircrafts() {
-
 	pthread_mutex_lock(&airspace_mutex);
-	for (unsigned i = 0; i < airspace.size(); i++){
-		airspace[i].updateLocation();
+	for (auto &s : airspace){
+		s.second.updateLocation();
 	}
 	pthread_mutex_unlock(&airspace_mutex);
-	/*for(Hit y : airspace) {
-		cout << '(' << y.getId() << ',' << y.getSpeedx() << ',' << y.getSpeedy() << ',' << y.getSpeedz() << ',' << y.getLocationx() << ',' << y.getLocationy() << ',' <<y.getLocationz() << ',' << y.getEntryTime() << ')' << endl;
-	}*/
-}
-
-void display(vector<Hit> vector) {
-	for(Hit x : vector) {
-				cout << "Aircraft_id: " << x.getId() << endl;
-				cout << "Coordinates: (" << x.getXCoordinates() << ',' << x.getYCoordinates() << ',' << x.getZCoordinates() << ')' << endl;
-			}
-	cout << endl;
 }

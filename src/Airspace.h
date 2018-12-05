@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <pthread.h>
+#include <map>
+#include <array>
 #include "Hit.h"
 using namespace std;
 
@@ -23,12 +25,13 @@ public:
 	void setAircraft() {}
 	void addAircraft(Hit hit);
 	void remAircraft(int id);
+	void setColliding(int, int);
 	void updateAircrafts();
 	void chgAircraftAlt(int, int);
-	void chgAircraftSpd(int, int[]);
+	void chgAircraftSpd(int, std::array<int, 3>);
 	int getSize();
 private:
-	vector<Hit> airspace;
+	std::map<int,Hit> airspace;
 	pthread_mutex_t airspace_mutex = PTHREAD_MUTEX_INITIALIZER;
 };
 

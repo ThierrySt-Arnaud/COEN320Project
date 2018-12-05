@@ -20,6 +20,9 @@ typedef void * (*UPDATE_FUNC_PTR)(void *);
 const int MAX_X = 100000;
 const int MAX_Y = 100000;
 const int MAX_Z = 25000;
+const int MIN_DIST = 1000;
+const int MIN_DIST_SQR = MIN_DIST*MIN_DIST;
+const int COLL_EST_TIME = 5;
 
 //100 000 x 100 000 x 25 000
 
@@ -40,6 +43,7 @@ private:
 	atomic_bool killFlag = ATOMIC_VAR_INIT(false);
 	void *update(void *);
 	void outOfBounds();
+	void collisionCheck();
 };
 
 #endif /* SRC_UPDATEAIRSPACE_H_ */

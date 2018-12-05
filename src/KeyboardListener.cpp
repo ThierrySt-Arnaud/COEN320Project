@@ -77,8 +77,6 @@ void KeyboardListener::altitude_change(){
 		parsed = wscanw(input_win,"%d", &ID);
 		wmove(input_win, 1,0);
 		wclrtoeol(input_win);
-
-		// TODO Check ID against Airspace
 	} while ((parsed == 0 || !checkID(ID)) && !wprintw(input_win, "Invalid ID! "));
 
 	if (parsed == ERR){
@@ -215,7 +213,7 @@ void KeyboardListener::speed_change(){
 		CommMessage spdChangeMsg = CommMessage(SPDREQUEST, content.str(), ID);
 		commserver->send(spdChangeMsg);
 
-		int newSpd[3] = { newVX, newVY, newVZ };
+		std::array<int, 3> newSpd = { newVX, newVY, newVZ };
 		airspace->chgAircraftSpd(ID, newSpd);
 
 		std::stringstream spdChangeLog;

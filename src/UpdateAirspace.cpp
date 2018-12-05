@@ -6,7 +6,10 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <time.h>
+#include <array>
+#include <math.h>
 #include "UpdateAirspace.h"
 #include "CommServer.h"
 #include "Hit.h"
@@ -46,6 +49,7 @@ void *UpdateAirspace::update(void *) {
 		timeout.tv_sec += 1;
 		pthread_mutex_timedlock_monotonic(&updateMutex, &timeout);
 		outOfBounds();
+		collisionCheck();
 
 		//vector<Hit> airspaceCpy = airspace->getAircrafts();
 	}
@@ -55,22 +59,62 @@ void *UpdateAirspace::update(void *) {
 //create function for out of bounds check
 void UpdateAirspace::outOfBounds() {
 
-	vector<int> outOfBoundsAricrafts;
+	vector<int> outOfBoundsAircrafts;
 	vector<Hit> airspaceCpy = airspace->getAircrafts();
 
-	for(Hit x : airspaceCpy) {
-		if(x.getLocationx() > MAX_X || x.getLocationx() < 0 || x.getLocationy() > MAX_Y || x.getLocationy() < 0 || x.getLocationz() > MAX_Z || x.getLocationz() < 0) {
-			outOfBoundsAricrafts.push_back(x.getId());
+	for(Hit h : airspaceCpy) {
+		int id = h.getId();
+		std::array<int, 3> loc = h.getLocation();
+		if(loc[0] > MAX_X || loc[0] < 0 || loc[1] > MAX_Y || loc[1] < 0 || loc[2] > MAX_Z || loc[2] < 0) {
+			outOfBoundsAircrafts.push_back(id);
 		}
 	}
 
-	for(int i : outOfBoundsAricrafts) {
+	for(int i : outOfBoundsAircrafts) {
 		airspace->remAircraft(i);
+		std::stringstream newLog;
+		newLog << "Flight #" << i << " left the airspace";
+		CommMessage logNewPlane(LOG, newLog.str(), i);
+		commServer->send(logNewPlane);
 	}
 
 }
 
-//create function for collision check
+void UpdateAirspace::collisionCheck(){
+	vector<Hit> airspaceCpy = airspace->getAircrafts();
+	size_t aircrafts = airspaceCpy.size();
+
+	if (aircrafts > 1){
+		for(unsigned i = 0; i < aircrafts-1; i++) {
+			std::array<int, 3> iSpd = airspaceCpy[i].getSpeed();
+			std::array<int, 3> iLoc = airspaceCpy[i].getLocation();
+			iLoc[0] += COLL_EST_TIME*iSpd[0]; iLoc[1] += COLL_EST_TIME*iSpd[1]; iLoc[2] += COLL_EST_TIME*iSpd[2];
+
+			for (unsigned j = i+1; j < aircrafts; j++){
+				std::array<int, 3>  jSpd = airspaceCpy[j].getSpeed();
+				std::array<int, 3> jLoc = airspaceCpy[j].getLocation();
+				int xDist = abs(iLoc[0] - jLoc[0] + COLL_EST_TIME*jSpd[0]);
+				if (xDist < MIN_DIST){
+					int yDist = abs(iLoc[1] - jLoc[1] + COLL_EST_TIME*jSpd[1]);
+					if (yDist < MIN_DIST){
+						int zDist = abs(iLoc[2] - jLoc[2] + COLL_EST_TIME*jSpd[2]);
+						if(zDist < MIN_DIST){
+							if((pow(xDist,2)+pow(yDist,2)+pow(zDist,2)) < MIN_DIST_SQR){
+								int iID =airspaceCpy[i].getId();
+								int jID =airspaceCpy[j].getId();
+								airspace->setColliding(iID,jID);
+								std::stringstream newLog;
+								newLog << "Minimum distance violation detected between flight #" << iID << " and flight #" << jID;
+								CommMessage logCollision(LOG, newLog.str(), i);
+								commServer->send(logCollision);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
 void UpdateAirspace::kill(){
 	killFlag = true;

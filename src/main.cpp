@@ -53,6 +53,12 @@ int main(){
 
 void ncursesSetup(int screenSize[]){
 	initscr();
+	if(!has_colors()){
+		printf("No colors!\n");
+	} else{
+		start_color();
+		init_pair(1,COLOR_RED,COLOR_BLACK);
+	}
 	clear();
 	noecho();
 	cbreak();	/* Line buffering disabled. pass on everything */
